@@ -2,6 +2,7 @@ import express, { Application, Response } from 'express';
 import { IApp } from './interfaces/app.interface';
 import { ILogger } from './interfaces/logger.interface';
 import { validateCreateUserInput } from './middlewares/user-input.middleware';
+import bodyParser from 'body-parser';
 
 export default class App implements IApp<Application> {
   readonly server: Application;
@@ -27,7 +28,7 @@ export default class App implements IApp<Application> {
   private _setupExpressServer(): Application {
     const app = express();
 
-    app.use(express.json());
+    app.use(bodyParser.json());
 
     app.get('/', (_, res: Response) => {
       res.send('Ok');
