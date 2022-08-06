@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import { Application } from 'express';
-import { Logger as PinoLogger } from 'pino';
 import { IApp } from './interfaces/app.interface';
 import App from './server';
-import logger from './utils/logger';
+import { PinoLogger } from './utils/logger';
 
-const expressApp: IApp<Application, PinoLogger> = new App(logger);
+const pinoLogger = new PinoLogger();
+
+const expressApp: IApp<Application> = new App(pinoLogger);
 
 expressApp.run();

@@ -1,13 +1,13 @@
 import express, { Application, Response } from 'express';
 import { IApp } from './interfaces/app.interface';
-import { Logger, LoggerOptions } from 'pino';
+import { ILogger } from './interfaces/logger.interface';
 
-export default class App implements IApp<Application, Logger> {
+export default class App implements IApp<Application> {
   readonly server: Application;
   readonly port: number;
-  readonly logger: Logger<LoggerOptions>;
+  readonly logger: ILogger;
 
-  constructor(logger: Logger, port = 3000) {
+  constructor(logger: ILogger, port = 3000) {
     this.server = this._setupExpressServer();
 
     this.port = port;
