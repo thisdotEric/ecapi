@@ -78,4 +78,91 @@ describe('User controller test', () => {
       });
     });
   });
+
+  describe('delete()', () => {
+    describe('user has a valid authorization token', () => {
+      test('should DELETE the user associated with the given user_id (from req.user object) and return 200 status', async () => {
+        const user_id = 'test-id';
+
+        const req: Partial<Request & User> = {
+          user: {
+            user_id,
+          },
+        };
+
+        const mockedService: Partial<IUserService> = {
+          delete: jest.fn().mockReturnValue(true),
+        };
+
+        // @ts-ignore
+        const userController = new UserController(mockedService);
+        // @ts-ignore
+        await userController.delete(req, res);
+
+        expect(mockedService.delete).toHaveBeenCalledWith(user_id);
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).not.toBeCalledWith();
+      });
+    });
+
+    describe('user has failed to delete his/her account', () => {
+      test('should return 400 status', async () => {
+        const user_id = 'test-id';
+
+        const req: Partial<Request & User> = {
+          user: {
+            user_id,
+          },
+        };
+
+        const mockedService: Partial<IUserService> = {
+          delete: jest.fn().mockReturnValue(false),
+        };
+
+        // @ts-ignore
+        const userController = new UserController(mockedService);
+        // @ts-ignore
+        await userController.delete(req, res);
+
+        expect(mockedService.delete).toHaveBeenCalledWith(user_id);
+        expect(res.status).toBeCalledWith(400);
+        expect(res.json).not.toBeCalledWith();
+      });
+    });
+  });
+
+  describe('update()', () => {
+    describe('user has a valid authorization token', () => {
+      test('should update the users name and email with values from the request body', async () => {
+        const updatedUserInfo = {
+          user_id: 'test_id',
+          name: expect.any(String),
+          email: expect.any(String),
+        };
+
+        const req: Partial<Request & User> = {
+          user: {
+            user_id: updatedUserInfo.user_id,
+          },
+          body: updatedUserInfo,
+        };
+
+        const mockedService: Partial<IUserService> = {
+          update: jest.fn().mockReturnValue(updatedUserInfo),
+        };
+
+        // @ts-ignore
+        const userController = new UserController(mockedService);
+        // @ts-ignore
+        await userController.update(req, res);
+
+        expect(mockedService.update).toHaveBeenCalledWith(
+          updatedUserInfo.user_id,
+          updatedUserInfo
+        );
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith(updatedUserInfo);
+      });
+    });
+  });
 });
