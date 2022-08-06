@@ -3,8 +3,6 @@ import { Application } from 'express';
 import App from '../../src/server';
 import { createUserInput, testLogger } from '../helpers';
 
-const USER_ROUTE = '/users';
-
 describe('User routes test', () => {
   describe('[POST /users]: Create new user', () => {
     let server: Application;
@@ -18,7 +16,7 @@ describe('User routes test', () => {
         const userInput = createUserInput();
 
         const { statusCode } = await supertest(server)
-          .post(USER_ROUTE)
+          .post('/users')
           .send(userInput);
 
         expect(statusCode).toBe(200);
@@ -28,7 +26,7 @@ describe('User routes test', () => {
     describe('user has provided an incomplete request body', () => {
       test('should return status 400', async () => {
         const { statusCode, text } = await supertest(server)
-          .post(USER_ROUTE)
+          .post('/users')
           .send({
             name: '',
             email: '',
@@ -44,7 +42,7 @@ describe('User routes test', () => {
     describe('user has provided different passwords', () => {
       test('should return status 400', async () => {
         const { statusCode, text } = await supertest(server)
-          .post(USER_ROUTE)
+          .post('/users')
           .send({
             ...createUserInput(),
             confirm_password: 'pass1',
