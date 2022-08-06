@@ -5,6 +5,7 @@ export interface IUser {
 
 export interface ICreateUserInput extends IUser {
   password: string;
+  confirm_password: string;
 }
 
 export interface ICreatedUser<TId> extends IUser {
