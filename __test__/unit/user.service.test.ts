@@ -1,16 +1,10 @@
-import {
-  ICreatedUser,
-  ICreateUserInput,
-} from '../../../src/modules/user/user.model';
-import UserService from '../../../src/modules/user/user.service';
+import { ICreatedUser } from '../../src/modules/user/user.model';
+import UserService from '../../src/modules/user/user.service';
+import { createUserInput } from '../helpers';
 
-describe('User test', () => {
+describe('User Service tests', () => {
   test('should create a new user', async () => {
-    const newUserInput: ICreateUserInput = {
-      name: 'John Doe',
-      email: 'johndoe@gmail.com',
-      password: 'password',
-    };
+    const newUserInput = createUserInput();
 
     const expectedUser: ICreatedUser<number> = {
       id: 1,

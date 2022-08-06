@@ -1,7 +1,7 @@
 import { Application } from 'express';
 import supertest from 'supertest';
-import App from '../src/server';
-import { testLogger } from './helpers';
+import App from '../../src/server';
+import { testLogger } from '../helpers';
 
 describe('[GET /]: Home route test', () => {
   let server: Application;
