@@ -1,8 +1,8 @@
 import express, { Application, Response } from 'express';
 import { IApp } from './interfaces/app.interface';
 import { ILogger } from './interfaces/logger.interface';
-import { validateCreateUserInput } from './middlewares/user-input.middleware';
 import bodyParser from 'body-parser';
+import userRoutes from './modules/user/user.routes';
 
 export default class App implements IApp<Application> {
   readonly server: Application;
@@ -34,13 +34,7 @@ export default class App implements IApp<Application> {
       res.send('Ok');
     });
 
-    app.post('/users', validateCreateUserInput, (_, res: Response) => {
-      try {
-        res.send('Ok');
-      } catch (error) {
-        res.status(400).send(error.message);
-      }
-    });
+    app.use('/users', userRoutes);
 
     return app;
   }

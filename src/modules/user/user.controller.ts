@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ICreateUserInput } from './user.model';
-import { IUserService } from './user.service';
+import { IUserService } from './user.interface';
 
 export default class UserController {
   private readonly userService: IUserService;
