@@ -16,6 +16,6 @@ export const mustProvideValidLoginCredentials = (
 
   if (email === '' || email == null || password === '' || password == null) {
     res.status(400);
-    res.send('Invalid login credentials');
+    res.send('Incomplete login credentials');
   } else return next();
 };
