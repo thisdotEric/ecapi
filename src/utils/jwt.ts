@@ -10,8 +10,6 @@ export const generateAccessToken = (user_id: string): string => {
 };
 
 export const generateRefreshToken = (user_id: string): string => {
-  const refreshToken = sign({ user_id }, `${process.env.ACCESS_TOKEN_SECRET}`);
+  const refreshToken = sign({ user_id }, `${process.env.REFRESH_TOKEN_SECRET}`);
   return refreshToken;
 };
-
-// export const verify = async (payload: string) => {};
