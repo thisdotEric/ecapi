@@ -10,5 +10,7 @@ const userController = new UserController(new UserService());
 
 router.post('/', validateCreateUserInput, userController.create);
 router.get('/', mustHaveValidJWT, userController.create);
+router.delete('/', mustHaveValidJWT, userController.delete);
+router.patch('/', mustHaveValidJWT, userController.update);
 
 export default router;

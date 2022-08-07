@@ -46,7 +46,7 @@ export default class UserController {
     try {
       const deleted = await this.userService.delete(req.user.user_id);
 
-      res.status(deleted ? 200 : 400);
+      res.sendStatus(deleted ? 200 : 400);
     } catch (error) {
       res.status(500);
       res.send(error.message);

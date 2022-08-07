@@ -17,6 +17,10 @@ export const validateCreateUserInput = (
   res: Response,
   next: NextFunction
 ): any => {
+  if (req.body == undefined) {
+    return res.sendStatus(400);
+  }
+
   const { name, email, password, confirm_password } =
     req.body as ICreateUserInput;
 
@@ -26,8 +30,8 @@ export const validateCreateUserInput = (
     hasNoValue(password) ||
     hasNoValue(confirm_password)
   ) {
-    res.status(400).send('Null or empty values not allowed');
+    return res.status(400).send('Null or empty values not allowed');
   } else if (passwordDoesNotMatched(password, confirm_password)) {
-    res.status(400).send('Password does not match');
-  } else next();
+    return res.status(400).send('Password does not match');
+  } else return next();
 };

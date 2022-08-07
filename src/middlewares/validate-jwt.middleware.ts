@@ -8,11 +8,13 @@ export const mustHaveValidJWT = (
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) res.status(401).send('Unauthorized');
+  if (!token) {
+    return res.sendStatus(401);
+  }
 
   req.user = {
     user_id: 'test_id',
   };
 
-  next();
+  return next();
 };
