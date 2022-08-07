@@ -87,7 +87,7 @@ export default class UserController {
       res.json(tokens);
     } catch (error) {
       res.status(500);
-      res.send('Failed to login user');
+      res.send(error.message);
     }
   }
 }

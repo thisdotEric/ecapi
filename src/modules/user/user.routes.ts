@@ -1,7 +1,11 @@
 import { getModelForClass } from '@typegoose/typegoose';
 import { Router } from 'express';
-import { validateCreateUserInput } from '../../middlewares/user-input.middleware';
-import { mustHaveValidJWT } from '../../middlewares/validate-jwt.middleware';
+import {
+  mustProvideValidLoginCredentials,
+  mustHaveValidJWT,
+  validateCreateUserInput,
+} from '../../middlewares';
+
 import UserController from './user.controller';
 import { User } from './user.model';
 import UserService from './user.service';
@@ -27,6 +31,10 @@ router.delete(
 
 router.patch('/', mustHaveValidJWT, userController.update.bind(userController));
 
-router.post('/sessions', userController.login.bind(userController));
+router.post(
+  '/sessions',
+  mustProvideValidLoginCredentials,
+  userController.login.bind(userController)
+);
 
 export default router;
