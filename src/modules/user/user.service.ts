@@ -1,6 +1,7 @@
 import { ReturnModelType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types';
-import { hashPassword } from '../../utils/password';
+import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
+import { hashPassword, verifyPassword } from '../../utils/password';
 import { ISessionService, ITokens, IUserService } from './user.interface';
 import { ICreatedUser, ICreateUserInput, IUser, User } from './user.model';
 
@@ -73,10 +74,31 @@ export default class UserService implements IUserService, ISessionService {
     };
   }
 
-  public async login(email: string, password: string): Promise<ITokens> {
-    console.log({ email, password });
+  public async login(
+    email: string,
+    password: string,
+    validatePasswordFn = verifyPassword
+  ): Promise<ITokens> {
+    const user = await this.userModel.findOne({ email });
 
-    throw new Error('Method not implemented.');
+    if (!user) throw new Error('User does not exists');
+
+    const user_id = user._id;
+    const salt = user.salt;
+    const hashedPassword = user.hashedPassword;
+
+    const validPassword = await validatePasswordFn(
+      password,
+      hashedPassword,
+      salt
+    );
+
+    if (!validPassword) throw new Error('Login failed');
+
+    return {
+      accessToken: generateAccessToken(user_id),
+      refreshToken: generateRefreshToken(user_id),
+    };
   }
 
   public async logout(): Promise<boolean> {

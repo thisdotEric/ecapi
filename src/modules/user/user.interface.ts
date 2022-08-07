@@ -1,3 +1,4 @@
+import { verifyPassword } from 'src/utils/password';
 import { ICreateUserInput, ICreatedUser, IUser } from './user.model';
 
 export interface IUserService {
@@ -15,7 +16,13 @@ export interface ITokens {
   accessToken: string;
 }
 
+type PasswordValidatorFn = typeof verifyPassword;
+
 export interface ISessionService {
-  login(email: string, password: string): Promise<ITokens>;
+  login(
+    email: string,
+    password: string,
+    passwordValidator: PasswordValidatorFn
+  ): Promise<ITokens>;
   logout(): Promise<boolean>;
 }
