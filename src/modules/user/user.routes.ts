@@ -17,7 +17,7 @@ router.post(
   userController.create.bind(userController)
 );
 
-router.get('/', userController.get.bind(userController));
+router.get('/', mustHaveValidJWT, userController.get.bind(userController));
 
 router.delete(
   '/',
@@ -26,5 +26,7 @@ router.delete(
 );
 
 router.patch('/', mustHaveValidJWT, userController.update.bind(userController));
+
+router.post('/sessions', userController.login.bind(userController));
 
 export default router;

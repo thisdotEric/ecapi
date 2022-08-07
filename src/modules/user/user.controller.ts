@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { ICreateUserInput, IUser } from './user.model';
-import { IUserService } from './user.interface';
+import { ILoginCredential } from 'src/interfaces/login.interface';
+import UserService from './user.service';
 
 export default class UserController {
-  private readonly userService: IUserService;
+  private readonly userService: UserService;
 
-  constructor(userService: IUserService) {
+  constructor(userService: UserService) {
     this.userService = userService;
   }
 
@@ -71,6 +72,22 @@ export default class UserController {
     } catch (error) {
       res.status(500);
       res.send(error.message);
+    }
+  }
+
+  /**
+   * login
+   */
+  public async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body as ILoginCredential;
+
+      const tokens = await this.userService.login(email, password);
+
+      res.json(tokens);
+    } catch (error) {
+      res.status(500);
+      res.send('Failed to login user');
     }
   }
 }

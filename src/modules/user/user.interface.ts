@@ -9,3 +9,13 @@ export interface IUserService {
     updatedUserInfo: IUser
   ): Promise<ICreatedUser<string>>;
 }
+
+export interface ITokens {
+  refreshToken: string;
+  accessToken: string;
+}
+
+export interface ISessionService {
+  login(email: string, password: string): Promise<ITokens>;
+  logout(): Promise<boolean>;
+}

@@ -1,10 +1,10 @@
 import { ReturnModelType } from '@typegoose/typegoose';
 import { BeAnObject } from '@typegoose/typegoose/lib/types';
 import { hashPassword } from '../../utils/password';
-import { IUserService } from './user.interface';
+import { ISessionService, ITokens, IUserService } from './user.interface';
 import { ICreatedUser, ICreateUserInput, IUser, User } from './user.model';
 
-export default class UserService implements IUserService {
+export default class UserService implements IUserService, ISessionService {
   constructor(
     private readonly userModel: ReturnModelType<typeof User, BeAnObject>
   ) {}
@@ -71,5 +71,15 @@ export default class UserService implements IUserService {
       name: updatedUserInfo.name,
       email: updatedUserInfo.email,
     };
+  }
+
+  public async login(email: string, password: string): Promise<ITokens> {
+    console.log({ email, password });
+
+    throw new Error('Method not implemented.');
+  }
+
+  public async logout(): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }
