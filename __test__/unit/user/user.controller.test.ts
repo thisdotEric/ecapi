@@ -13,6 +13,7 @@ describe('User controller test', () => {
   const res: Partial<Response> = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockImplementation((data) => data),
+    sendStatus: jest.fn(),
   };
 
   describe('create()', () => {
@@ -100,7 +101,7 @@ describe('User controller test', () => {
         await userController.delete(req, res);
 
         expect(mockedService.delete).toHaveBeenCalledWith(user_id);
-        expect(res.status).toBeCalledWith(200);
+        expect(res.sendStatus).toBeCalledWith(200);
         expect(res.json).not.toBeCalledWith();
       });
     });
@@ -125,7 +126,7 @@ describe('User controller test', () => {
         await userController.delete(req, res);
 
         expect(mockedService.delete).toHaveBeenCalledWith(user_id);
-        expect(res.status).toBeCalledWith(400);
+        expect(res.sendStatus).toBeCalledWith(400);
         expect(res.json).not.toBeCalledWith();
       });
     });
