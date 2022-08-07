@@ -1,7 +1,14 @@
+import { ReturnModelType } from '@typegoose/typegoose';
+import { BeAnObject } from '@typegoose/typegoose/lib/types';
+import { hashPassword } from '../../utils/password';
 import { IUserService } from './user.interface';
-import { ICreatedUser, ICreateUserInput, IUser } from './user.model';
+import { ICreatedUser, ICreateUserInput, IUser, User } from './user.model';
 
 export default class UserService implements IUserService {
+  constructor(
+    private readonly userModel: ReturnModelType<typeof User, BeAnObject>
+  ) {}
+
   public async get(user_id: string): Promise<ICreatedUser<string>> {
     return {
       id: user_id,
@@ -11,21 +18,30 @@ export default class UserService implements IUserService {
   }
 
   /**
-  s * Create a new user
+   * Create a new user
    * @param ICreateUserInput
    * @returns ICreatedUser<number>
    */
 
-  public async create(
-    newUserInput: ICreateUserInput
-  ): Promise<ICreatedUser<string>> {
-    const createdUser: ICreatedUser<string> = {
-      id: '',
-      name: newUserInput.name,
-      email: newUserInput.email,
-    };
+  public async create({
+    name,
+    email,
+    password,
+  }: ICreateUserInput): Promise<ICreatedUser<string>> {
+    const { salt, hashedPassword } = await hashPassword(password);
 
-    return createdUser;
+    const doc = await this.userModel.create({
+      name,
+      email,
+      hashedPassword,
+      salt,
+    });
+
+    return {
+      id: doc._id.toString(),
+      name: doc.name,
+      email: doc.email,
+    };
   }
 
   public async delete(user_id: string): Promise<boolean> {
