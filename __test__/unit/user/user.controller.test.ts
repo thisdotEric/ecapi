@@ -1,6 +1,9 @@
 import { Response, Request } from 'express';
 import UserController from '../../../src/modules/user/user.controller';
-import { IUserService } from '../../../src/modules/user/user.interface';
+import {
+  ISessionService,
+  IUserService,
+} from '../../../src/modules/user/user.interface';
 import { createUserInput } from '../../helpers';
 
 type User = {
@@ -43,6 +46,41 @@ describe('User controller test', () => {
         expect(mockedService.create).toHaveBeenCalledWith(userInput);
         expect(res.status).toBeCalledWith(201);
         expect(res.json).toBeCalledWith(newUser);
+      });
+    });
+  });
+
+  describe('login()', () => {
+    describe('user has provided email and password on the request body', () => {
+      test('should login then return JWT access and refresh tokens', async () => {
+        const loginCredentials = {
+          email: 'johndoe@gmail.com',
+          password: 'password',
+        };
+
+        const req: Partial<Request> = {
+          body: loginCredentials,
+        };
+
+        const tokens = {
+          accessToken: expect.any(String),
+          refreshToken: expect.any(String),
+        };
+
+        const mockedService: Partial<ISessionService> = {
+          login: jest.fn().mockReturnValue(tokens),
+        };
+
+        // @ts-ignore
+        const userController = new UserController(mockedService);
+        // @ts-ignore
+        await userController.login(req, res);
+
+        expect(mockedService.login).toHaveBeenCalledWith(
+          loginCredentials.email,
+          loginCredentials.password
+        );
+        expect(res.json).toBeCalledWith(tokens);
       });
     });
   });
