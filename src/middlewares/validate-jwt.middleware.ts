@@ -1,4 +1,9 @@
+// For some reason, process.env does not pick up values from .env file
+// and needed to re-import dotenv/package to work.
+import 'dotenv/config';
+
 import { NextFunction, Request, Response } from 'express';
+import { JwtPayload, verify } from 'jsonwebtoken';
 
 export const mustHaveValidJWT = (
   req: Request,
@@ -12,9 +17,15 @@ export const mustHaveValidJWT = (
     return res.sendStatus(401);
   }
 
-  req.user = {
-    user_id: 'test_id',
-  };
+  try {
+    const decoded = verify(token, `${process.env.ACCESS_TOKEN_SECRET}`);
 
-  return next();
+    req.user = {
+      user_id: (decoded as JwtPayload).user_id,
+    };
+
+    return next();
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
