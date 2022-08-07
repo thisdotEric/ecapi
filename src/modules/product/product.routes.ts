@@ -1,5 +1,6 @@
 import { getModelForClass } from '@typegoose/typegoose';
 import { Router } from 'express';
+import { mustHaveValidJWT } from '../../middlewares';
 import ProductController from './product.controller';
 import { Product } from './product.model';
 import ProductService from './product.service';
@@ -12,6 +13,22 @@ const productController = new ProductController(
 
 const router = Router();
 
-router.post('/', productController.create.bind(productController));
+router.post(
+  '/',
+  mustHaveValidJWT,
+  productController.create.bind(productController)
+);
+
+router.get(
+  '/',
+  mustHaveValidJWT,
+  productController.getAll.bind(productController)
+);
+
+router.get(
+  '/:product_id',
+  mustHaveValidJWT,
+  productController.get.bind(productController)
+);
 
 export default router;

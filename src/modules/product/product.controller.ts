@@ -5,11 +5,40 @@ import ProductService from './product.service';
 export default class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  /**
+   * get
+   */
+  public async get(req: Request, res: Response) {
+    const product_id = req.params.product_id as string;
+    const user_id = req.user.user_id;
+
+    try {
+      const product = await this.productService.get(user_id, product_id);
+
+      res.status(200);
+      res.json(product);
+    } catch (error) {
+      res.sendStatus(404);
+    }
+  }
+
+  /**
+   * getAll
+   */
+  public async getAll(req: Request, res: Response) {
+    try {
+      const products = await this.productService.getAll(req.user.user_id);
+
+      res.status(200);
+      res.json(products);
+    } catch (error) {
+      res.sendStatus(404);
+    }
+  }
+
   public async create(req: Request, res: Response) {
     const product = req.body as IProduct;
-    const user_id = '';
-
-    console.log(product);
+    const user_id = req.user.user_id;
 
     try {
       const savedProduct = await this.productService.create(user_id, product);
