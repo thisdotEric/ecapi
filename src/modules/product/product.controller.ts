@@ -9,12 +9,16 @@ export default class ProductController {
     const product = req.body as IProduct;
     const user_id = '';
 
+    console.log(product);
+
     try {
       const savedProduct = await this.productService.create(user_id, product);
 
       res.status(201);
       res.json(savedProduct);
     } catch (error) {
+      console.log(error.message);
+
       res.status(400);
       res.send('Unable to save the product');
     }

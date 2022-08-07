@@ -3,6 +3,7 @@ import { IApp } from './interfaces/app.interface';
 import { ILogger } from './interfaces/logger.interface';
 import bodyParser from 'body-parser';
 import userRoutes from './modules/user/user.routes';
+import productRoutes from './modules/product/product.routes';
 
 export default class App implements IApp<Application> {
   readonly server: Application;
@@ -35,6 +36,7 @@ export default class App implements IApp<Application> {
     });
 
     app.use('/users', userRoutes);
+    app.use('/products', productRoutes);
 
     return app;
   }
