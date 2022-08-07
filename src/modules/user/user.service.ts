@@ -53,10 +53,13 @@ export default class UserService implements IUserService {
   }
 
   public async delete(user_id: string): Promise<boolean> {
-    console.log(user_id);
-    throw new Error('');
+    const deletedUser = await this.userModel.findByIdAndDelete({
+      _id: user_id,
+    });
 
-    // return true;
+    if (deletedUser == null) throw new Error('Unable to delete user');
+
+    return true;
   }
 
   public async update(

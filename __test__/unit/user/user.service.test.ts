@@ -84,4 +84,50 @@ describe('User Service tests', () => {
       });
     });
   });
+
+  describe('delete()', () => {
+    describe('user has provided a valid user_id', () => {
+      test('should delete the user and return true', async () => {
+        const user = createUserInput();
+
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          findByIdAndDelete: jest.fn().mockReturnValue({
+            _id: new mongoose.Types.ObjectId(),
+            name: user.name,
+            email: user.email,
+          }),
+        };
+
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+        const userIsDeleted = await userService.delete('user_id');
+
+        expect(mockedUserModel.findByIdAndDelete).toBeCalledTimes(1);
+        expect(userIsDeleted).toBeTruthy();
+      });
+    });
+
+    describe('user has provided an invalid user_id', () => {
+      test("should throw an error 'Unable to delete user'", async () => {
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          findByIdAndDelete: jest.fn().mockReturnValue(null),
+        };
+
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+
+        try {
+          await userService.delete('invalid_id');
+        } catch (error) {
+          expect(mockedUserModel.findByIdAndDelete).toBeCalledTimes(1);
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toBe('Unable to delete user');
+        }
+      });
+    });
+  });
 });
