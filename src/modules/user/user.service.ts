@@ -10,10 +10,16 @@ export default class UserService implements IUserService {
   ) {}
 
   public async get(user_id: string): Promise<ICreatedUser<string>> {
+    const user = await this.userModel.findById({
+      _id: user_id,
+    });
+
+    if (!user) throw new Error('User not found');
+
     return {
-      id: user_id,
-      name: 'sdf',
-      email: 'john@gmail.com',
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
     };
   }
 
@@ -30,17 +36,19 @@ export default class UserService implements IUserService {
   }: ICreateUserInput): Promise<ICreatedUser<string>> {
     const { salt, hashedPassword } = await hashPassword(password);
 
-    const doc = await this.userModel.create({
+    const userDoc = await this.userModel.create({
       name,
       email,
       hashedPassword,
       salt,
     });
 
+    if (!userDoc) throw new Error('Error creating user');
+
     return {
-      id: doc._id.toString(),
-      name: doc.name,
-      email: doc.email,
+      id: userDoc._id.toString(),
+      name: userDoc.name,
+      email: userDoc.email,
     };
   }
 

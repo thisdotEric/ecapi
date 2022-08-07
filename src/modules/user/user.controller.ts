@@ -35,6 +35,7 @@ export default class UserController {
       res.status(200);
       res.json(user);
     } catch (error) {
+      res.status(404);
       res.send(error.message);
     }
   }
