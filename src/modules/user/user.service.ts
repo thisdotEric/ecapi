@@ -1,14 +1,34 @@
 import { ReturnModelType } from '@typegoose/typegoose';
-import { BeAnObject } from '@typegoose/typegoose/lib/types';
+import {
+  BeAnObject,
+  IObjectWithTypegooseFunction,
+} from '@typegoose/typegoose/lib/types';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 import { hashPassword, verifyPassword } from '../../utils/password';
 import { ISessionService, ITokens, IUserService } from './user.interface';
 import { ICreatedUser, ICreateUserInput, IUser, User } from './user.model';
+import { Document, Types } from 'mongoose';
+
+export type ProductModelType = ReturnModelType<typeof User, BeAnObject>;
+
+type UserDoc = Document<any, BeAnObject, User> &
+  User &
+  IObjectWithTypegooseFunction & {
+    _id: Types.ObjectId;
+  };
 
 export default class UserService implements IUserService, ISessionService {
   constructor(
     private readonly userModel: ReturnModelType<typeof User, BeAnObject>
   ) {}
+
+  private _toUser({ _id: id, name, email }: UserDoc): ICreatedUser<string> {
+    return {
+      id,
+      name,
+      email,
+    };
+  }
 
   public async get(user_id: string): Promise<ICreatedUser<string>> {
     const user = await this.userModel.findById({
@@ -17,11 +37,7 @@ export default class UserService implements IUserService, ISessionService {
 
     if (!user) throw new Error('User not found');
 
-    return {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-    };
+    return this._toUser(user);
   }
 
   /**
@@ -46,11 +62,7 @@ export default class UserService implements IUserService, ISessionService {
 
     if (!userDoc) throw new Error('Error creating user');
 
-    return {
-      id: userDoc._id.toString(),
-      name: userDoc.name,
-      email: userDoc.email,
-    };
+    return this._toUser(userDoc);
   }
 
   public async delete(user_id: string): Promise<boolean> {
@@ -67,11 +79,17 @@ export default class UserService implements IUserService, ISessionService {
     user_id: string,
     updatedUserInfo: IUser
   ): Promise<ICreatedUser<string>> {
-    return {
-      id: user_id,
-      name: updatedUserInfo.name,
-      email: updatedUserInfo.email,
-    };
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      {
+        _id: user_id,
+      },
+      { ...updatedUserInfo },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser) throw new Error('User not found');
+
+    return this._toUser(updatedUser);
   }
 
   public async login(

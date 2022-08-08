@@ -20,7 +20,7 @@ describe('User Service tests', () => {
       const mockedUserModel: Partial<ReturnModelType<typeof User, BeAnObject>> =
         {
           create: jest.fn().mockReturnValue({
-            _id: new mongoose.Types.ObjectId(),
+            _id: expect.any(String),
             name: newUserInput.name,
             email: newUserInput.email,
           }),
@@ -50,7 +50,7 @@ describe('User Service tests', () => {
           ReturnModelType<typeof User, BeAnObject>
         > = {
           findById: jest.fn().mockReturnValue({
-            _id: new mongoose.Types.ObjectId(),
+            _id: expect.any(String),
             name: user.name,
             email: user.email,
           }),
@@ -82,6 +82,42 @@ describe('User Service tests', () => {
           expect(error).toBeInstanceOf(Error);
           expect(error.message).toBe('User not found');
         }
+      });
+    });
+  });
+
+  describe('update()', () => {
+    describe('user has provided valid fields to be updated', () => {
+      test('update and return the updated user information ', async () => {
+        const user_id = 'user_id';
+
+        const userInput = {
+          name: expect.any(String),
+          email: expect.any(String),
+        };
+
+        const expectedUser: ICreatedUser<string> = {
+          id: user_id,
+          name: userInput.name,
+          email: userInput.email,
+        };
+
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          findOneAndUpdate: jest.fn().mockReturnValue({
+            _id: user_id,
+            name: userInput.name,
+            email: userInput.email,
+          }),
+        };
+
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+        const updatedUser = await userService.update(user_id, userInput);
+
+        expect(mockedUserModel.findOneAndUpdate).toBeCalledTimes(1);
+        expect(updatedUser).toEqual(expectedUser);
       });
     });
   });
@@ -149,7 +185,7 @@ describe('User Service tests', () => {
           ReturnModelType<typeof User, BeAnObject>
         > = {
           findOne: jest.fn().mockReturnValue({
-            _id: new mongoose.Types.ObjectId(),
+            _id: expect.any(String),
             name: 'name',
             email,
             salt,
@@ -189,7 +225,7 @@ describe('User Service tests', () => {
           ReturnModelType<typeof User, BeAnObject>
         > = {
           findOne: jest.fn().mockReturnValue({
-            _id: new mongoose.Types.ObjectId(),
+            _id: expect.any(String),
             name: 'name',
             email,
             salt: 'invalidsalt',

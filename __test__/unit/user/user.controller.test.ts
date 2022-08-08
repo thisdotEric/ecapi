@@ -4,6 +4,7 @@ import {
   ISessionService,
   IUserService,
 } from '../../../src/modules/user/user.interface';
+import { ICreatedUser } from '../../../src/modules/user/user.model';
 import { createUserInput } from '../../helpers';
 
 type User = {
@@ -172,22 +173,28 @@ describe('User controller test', () => {
 
   describe('update()', () => {
     describe('user has a valid authorization token', () => {
-      test('should update the users name and email with values from the request body', async () => {
-        const updatedUserInfo = {
-          user_id: 'test_id',
+      test('should update the user information with values from the request body', async () => {
+        const user_id = 'user_id';
+
+        const updateInfoInput = {
           name: expect.any(String),
           email: expect.any(String),
         };
 
+        const returnedUpdatedInfo: ICreatedUser<string> = {
+          id: user_id,
+          ...updateInfoInput,
+        };
+
         const req: Partial<Request & User> = {
           user: {
-            user_id: updatedUserInfo.user_id,
+            user_id,
           },
-          body: updatedUserInfo,
+          body: updateInfoInput,
         };
 
         const mockedService: Partial<IUserService> = {
-          update: jest.fn().mockReturnValue(updatedUserInfo),
+          update: jest.fn().mockReturnValue(returnedUpdatedInfo),
         };
 
         // @ts-ignore
@@ -196,11 +203,11 @@ describe('User controller test', () => {
         await userController.update(req, res);
 
         expect(mockedService.update).toHaveBeenCalledWith(
-          updatedUserInfo.user_id,
-          updatedUserInfo
+          req.user!.user_id,
+          updateInfoInput
         );
         expect(res.status).toBeCalledWith(200);
-        expect(res.json).toBeCalledWith(updatedUserInfo);
+        expect(res.json).toBeCalledWith(returnedUpdatedInfo);
       });
     });
   });
