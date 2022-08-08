@@ -1,12 +1,32 @@
 import { ReturnModelType } from '@typegoose/typegoose';
-import { BeAnObject } from '@typegoose/typegoose/lib/types';
+import {
+  BeAnObject,
+  IObjectWithTypegooseFunction,
+} from '@typegoose/typegoose/lib/types';
 import { IProductService } from './product.interface';
 import { ICreatedProduct, IProduct, Product } from './product.model';
+import { Document, Types } from 'mongoose';
 
 export type ProductModelType = ReturnModelType<typeof Product, BeAnObject>;
 
+type ProductDoc = Document<any, BeAnObject, Product> &
+  Product &
+  IObjectWithTypegooseFunction & {
+    _id: Types.ObjectId;
+  };
+
 export default class ProductService implements IProductService {
   constructor(private readonly productModel: ProductModelType) {}
+
+  private _toProduct(product: ProductDoc): ICreatedProduct {
+    return {
+      product_id: product._id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      tags: product.tags,
+    };
+  }
 
   public async get(
     user_id: string,
@@ -17,17 +37,9 @@ export default class ProductService implements IProductService {
       user_id,
     });
 
-    console.log(product);
-
     if (!product) throw new Error('Product not found');
 
-    return {
-      product_id: product._id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      tags: product.tags,
-    };
+    return this._toProduct(product);
   }
 
   public async getAll(user_id: string): Promise<ICreatedProduct[]> {
@@ -35,13 +47,7 @@ export default class ProductService implements IProductService {
 
     if (!products) throw new Error('Products not found');
 
-    return products.map((product) => ({
-      product_id: product._id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      tags: product.tags,
-    }));
+    return products.map((product) => this._toProduct(product));
   }
 
   public async create(
@@ -52,12 +58,6 @@ export default class ProductService implements IProductService {
 
     if (newProduct == null) throw new Error('Failed to save the product');
 
-    return {
-      product_id: newProduct._id,
-      name: newProduct.name,
-      description: newProduct.description,
-      price: newProduct.price,
-      tags: newProduct.tags,
-    };
+    return this._toProduct(newProduct);
   }
 }
