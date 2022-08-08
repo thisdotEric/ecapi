@@ -172,19 +172,21 @@ describe('Product service test', () => {
     describe('user has provided a valid product_id', () => {
       test('should delete the product and return true', async () => {
         const product_id = 'product_id';
+        const user_id = 'user_id';
 
         const mockProductModel: Partial<ProductModelType> = {
-          findByIdAndDelete: jest
+          findOneAndDelete: jest
             .fn()
             .mockReturnValue({ _id: product_id, ...createProductInput() }),
         };
 
         // @ts-ignore
         const productService = new ProductService(mockProductModel);
-        const deleted = await productService.delete(product_id);
+        const deleted = await productService.delete(user_id, product_id);
 
-        expect(mockProductModel.findByIdAndDelete).toHaveBeenCalledWith({
+        expect(mockProductModel.findOneAndDelete).toHaveBeenCalledWith({
           _id: product_id,
+          user_id,
         });
         expect(deleted).toBeTruthy();
       });
@@ -193,23 +195,72 @@ describe('Product service test', () => {
     describe('user has provided an INVALID product_id', () => {
       test("should throw an error 'Product not found'", async () => {
         const product_id = '';
+        const user_id = '';
 
         const mockProductModel: Partial<ProductModelType> = {
-          findByIdAndDelete: jest.fn().mockReturnValue(null),
+          findOneAndDelete: jest.fn().mockReturnValue(null),
         };
 
         // @ts-ignore
         const productService = new ProductService(mockProductModel);
 
         try {
-          await productService.delete(product_id);
+          await productService.delete(user_id, product_id);
         } catch (error) {
-          expect(mockProductModel.findByIdAndDelete).toHaveBeenCalledWith({
+          expect(mockProductModel.findOneAndDelete).toHaveBeenCalledWith({
             _id: product_id,
+            user_id,
           });
           expect(error).toBeInstanceOf(Error);
           expect(error.message).toBe('Product not found');
         }
+      });
+    });
+  });
+
+  describe('update()', () => {
+    describe('user has provided a valid user_id, product_id and fields of the product to be updated', () => {
+      test('should update and return the updated product informations', async () => {
+        const product_id = 'product_id';
+        const user_id = 'user_id';
+
+        const productToBeUpdated: Partial<IProduct> = {
+          name: 'new name',
+          description: 'updated description',
+        };
+
+        const returnedUpdatedProduct: ICreatedProduct = {
+          product_id: product_id,
+          ...createProductInput(),
+          ...productToBeUpdated,
+        };
+
+        const mockProductModel: Partial<ProductModelType> = {
+          findOneAndUpdate: jest.fn().mockReturnValue({
+            _id: product_id,
+            ...createProductInput(),
+            ...productToBeUpdated,
+          }),
+        };
+
+        // @ts-ignore
+        const productService = new ProductService(mockProductModel);
+        const updatedProduct = await productService.update(
+          user_id,
+          product_id,
+          productToBeUpdated
+        );
+
+        expect(updatedProduct).not.toBe(null);
+        expect(returnedUpdatedProduct).toStrictEqual(updatedProduct);
+        expect(mockProductModel.findOneAndUpdate).toHaveBeenCalledWith(
+          {
+            _id: product_id,
+            user_id,
+          },
+          { ...productToBeUpdated },
+          { returnDocument: 'after' }
+        );
       });
     });
   });

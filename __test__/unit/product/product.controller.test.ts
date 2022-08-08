@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import ProductController from '../../../src/modules/product/product.controller';
 import { IProductService } from '../../../src/modules/product/product.interface';
-import { ICreatedProduct } from '../../../src/modules/product/product.model';
+import {
+  ICreatedProduct,
+  IProduct,
+} from '../../../src/modules/product/product.model';
 import { createProductInput } from '../../helpers';
 
 type User = {
@@ -128,9 +131,6 @@ describe('Product controller test', () => {
   describe('delete()', () => {
     describe('user has a valid user_id and product_id', () => {
       test('should delete the product and send 200 status code', async () => {
-        const product_id = 'product_id';
-        const user_id = 'user_id';
-
         const mockedProductService: Partial<IProductService> = {
           delete: jest.fn().mockReturnValue(true),
         };
@@ -140,10 +140,10 @@ describe('Product controller test', () => {
 
         const req: Partial<Request & User> = {
           params: {
-            product_id,
+            product_id: 'product_id',
           },
           user: {
-            user_id,
+            user_id: 'user_id',
           },
         };
 
@@ -151,6 +151,7 @@ describe('Product controller test', () => {
         await productController.delete(req, res);
 
         expect(mockedProductService.delete).toHaveBeenLastCalledWith(
+          req.user!.user_id,
           req.params!.product_id
         );
         expect(res.json).not.toHaveBeenCalledWith();
@@ -188,6 +189,55 @@ describe('Product controller test', () => {
           expect(error).toBeInstanceOf(Error);
           expect(error.message).toBe('Product not found');
         }
+      });
+    });
+  });
+
+  describe('update()', () => {
+    describe('user has a valid product_id and fields to be updated on the request body', () => {
+      test('should update and return rhe product then send 200 status code', async () => {
+        const product_id = 'product_id';
+        const user_id = 'user_id';
+        const product = createProductInput();
+
+        const productInput: Partial<IProduct> = {
+          name: 'Jag',
+        };
+
+        const updatedProduct: ICreatedProduct = {
+          product_id,
+          ...product,
+
+          // Spread the updated product
+          ...productInput,
+        };
+
+        const mockedProductService: Partial<IProductService> = {
+          update: jest.fn().mockReturnValue(updatedProduct),
+        };
+
+        // @ts-ignore
+        const productController = new ProductController(mockedProductService);
+
+        const req: Partial<Request & User> = {
+          params: {
+            product_id,
+          },
+          user: {
+            user_id,
+          },
+          body: productInput,
+        };
+
+        // @ts-ignore
+        await productController.update(req, res);
+
+        expect(mockedProductService.update).toHaveBeenLastCalledWith(
+          req.user!.user_id,
+          req.params!.product_id,
+          req.body
+        );
+        expect(res.json).toHaveBeenCalledWith(updatedProduct);
       });
     });
   });
