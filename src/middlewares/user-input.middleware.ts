@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ICreateUserInput } from 'src/modules/user/user.model';
-
-const hasNoValue = (property: any): boolean => {
-  return property == undefined || property === '';
-};
+import { z } from 'zod';
 
 const passwordDoesNotMatched = (
   password: string,
@@ -11,6 +8,15 @@ const passwordDoesNotMatched = (
 ): boolean => {
   return password !== confirm_password;
 };
+
+export const CreateUserInputSchema = z.object({
+  name: z.string(),
+  email: z.string(),
+  password: z.string(),
+  confirm_password: z.string(),
+});
+
+export const emailSchema = z.string().email();
 
 export const validateCreateUserInput = (
   req: Request,
@@ -21,17 +27,24 @@ export const validateCreateUserInput = (
     return res.sendStatus(400);
   }
 
-  const { name, email, password, confirm_password } =
-    req.body as ICreateUserInput;
+  let userInput: ICreateUserInput = CreateUserInputSchema.parse(req.body);
 
-  if (
-    hasNoValue(name) ||
-    hasNoValue(email) ||
-    hasNoValue(password) ||
-    hasNoValue(confirm_password)
-  ) {
-    return res.status(400).send('Null or empty values not allowed');
-  } else if (passwordDoesNotMatched(password, confirm_password)) {
-    return res.status(400).send('Password does not match');
-  } else return next();
+  if (userInput == undefined) {
+    res.status(400);
+    return res.send('Invalid request body form');
+  }
+
+  const { email, password, confirm_password } = userInput;
+
+  if (emailSchema.parse(email) === '') {
+    res.status(400);
+    return res.send('Invalid email');
+  }
+
+  if (passwordDoesNotMatched(password, confirm_password)) {
+    res.status(400);
+    return res.send('Password does not match');
+  }
+
+  return next();
 };
