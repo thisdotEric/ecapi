@@ -122,4 +122,12 @@ export default class UserService implements IUserService, ISessionService {
   public async logout(): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
+
+  public async getAll(): Promise<ICreatedUser<string>[]> {
+    const users = await this.userModel.find({});
+
+    if (!users) throw new Error('Users not found');
+
+    return users.map((user) => this._toUser(user));
+  }
 }

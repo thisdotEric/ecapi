@@ -90,4 +90,19 @@ export default class UserController {
       res.send(error.message);
     }
   }
+
+  /**
+   * getAll
+   */
+  public async getAll(_: Request, res: Response) {
+    try {
+      const users = await this.userService.getAll();
+
+      res.status(200);
+      res.json(users);
+    } catch (error) {
+      res.status(404);
+      res.send(error.message);
+    }
+  }
 }

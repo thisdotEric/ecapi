@@ -86,6 +86,59 @@ describe('User Service tests', () => {
     });
   });
 
+  describe('getAll()', () => {
+    describe('user is logged in', () => {
+      test('return all the users', async () => {
+        const user = createUserInput();
+
+        const expectedUsers: ICreatedUser<string>[] = [
+          {
+            id: expect.any(String),
+            name: user.name,
+            email: user.email,
+          },
+        ];
+
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          find: jest
+            .fn()
+            .mockReturnValue([
+              { _id: expect.any(String), name: user.name, email: user.email },
+            ]),
+        };
+
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+        const allUsers = await userService.getAll();
+
+        expect(mockedUserModel.find).toBeCalledTimes(1);
+        expect(allUsers).toStrictEqual(expectedUsers);
+      });
+    });
+
+    describe('user has provided an invalid user_id', () => {
+      test("should throw an error 'User not found'", async () => {
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          findById: jest.fn().mockReturnValue(null),
+        };
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+
+        try {
+          await userService.get('invalid_id');
+        } catch (error) {
+          expect(mockedUserModel.findById).toBeCalledTimes(1);
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toBe('User not found');
+        }
+      });
+    });
+  });
+
   describe('update()', () => {
     describe('user has provided valid fields to be updated', () => {
       test('update and return the updated user information ', async () => {

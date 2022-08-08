@@ -9,6 +9,7 @@ export interface IUserService {
     user_id: string,
     updatedUserInfo: IUser
   ): Promise<ICreatedUser<string>>;
+  getAll(): Promise<ICreatedUser<string>[]>;
 }
 
 export interface ITokens {

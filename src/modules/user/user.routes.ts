@@ -21,7 +21,9 @@ router.post(
   userController.create.bind(userController)
 );
 
-router.get('/', mustHaveValidJWT, userController.get.bind(userController));
+router.get('/', mustHaveValidJWT, userController.getAll.bind(userController));
+
+router.get('/me', mustHaveValidJWT, userController.get.bind(userController));
 
 router.delete(
   '/',

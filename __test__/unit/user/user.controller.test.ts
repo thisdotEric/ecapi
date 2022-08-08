@@ -119,6 +119,41 @@ describe('User controller test', () => {
     });
   });
 
+  describe('getAll()', () => {
+    describe('user has a valid authorization token', () => {
+      test('should return all the users', async () => {
+        const user_id = 'test-id';
+
+        const req: Partial<Request & User> = {
+          user: {
+            user_id,
+          },
+        };
+
+        const sampleUsers = [
+          {
+            user_id,
+            name: expect.any(String),
+            email: expect.any(String),
+          },
+        ];
+
+        const mockedService: Partial<IUserService> = {
+          getAll: jest.fn().mockReturnValue(sampleUsers),
+        };
+
+        // @ts-ignore
+        const userController = new UserController(mockedService);
+        // @ts-ignore
+        await userController.getAll(req, res);
+
+        expect(mockedService.getAll).toHaveBeenCalled();
+        expect(res.status).toBeCalledWith(200);
+        expect(res.json).toBeCalledWith(sampleUsers);
+      });
+    });
+  });
+
   describe('delete()', () => {
     describe('user has a valid authorization token', () => {
       test('should DELETE the user associated with the given user_id (from req.user object) and return 200 status', async () => {
