@@ -63,4 +63,21 @@ export default class ProductController {
       res.send(error.message);
     }
   }
+
+  public async update(req: Request, res: Response) {
+    const product_id = req.params.product_id as string;
+    const product = req.body as Partial<IProduct>;
+
+    try {
+      const newlyUpdatedProduct = await this.productService.update(
+        product_id,
+        product
+      );
+
+      res.json(newlyUpdatedProduct);
+    } catch (error) {
+      res.status(404);
+      res.send(error.message);
+    }
+  }
 }

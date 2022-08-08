@@ -5,4 +5,8 @@ export interface IProductService {
   get(user_id: string, product_id: string): Promise<ICreatedProduct>;
   getAll(user_id: string): Promise<ICreatedProduct[]>;
   delete(product_id: string): Promise<boolean>;
+  update(
+    product_id: string,
+    updatedProduct: Partial<IProduct>
+  ): Promise<ICreatedProduct>;
 }

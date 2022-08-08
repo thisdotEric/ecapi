@@ -70,4 +70,23 @@ export default class ProductService implements IProductService {
 
     return true;
   }
+
+  public async update(
+    product_id: string,
+    updatedProduct: Partial<IProduct>
+  ): Promise<ICreatedProduct> {
+    const returnedUpdatedProduct = await this.productModel.findByIdAndUpdate(
+      {
+        _id: product_id,
+      },
+      {
+        ...updatedProduct,
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!returnedUpdatedProduct) throw new Error('Product not found');
+
+    return this._toProduct(returnedUpdatedProduct);
+  }
 }
