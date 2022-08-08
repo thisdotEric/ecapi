@@ -13,34 +13,17 @@ const productController = new ProductController(
 
 const router = Router();
 
-router.post(
-  '/',
-  mustHaveValidJWT,
-  productController.create.bind(productController)
-);
+// Important, this middleware will be applied to all routes
+router.use(mustHaveValidJWT);
 
-router.get(
-  '/',
-  mustHaveValidJWT,
-  productController.getAll.bind(productController)
-);
+router.post('/', productController.create.bind(productController));
 
-router.get(
-  '/:product_id',
-  mustHaveValidJWT,
-  productController.get.bind(productController)
-);
+router.get('/', productController.getAll.bind(productController));
 
-router.delete(
-  '/:product_id',
-  mustHaveValidJWT,
-  productController.delete.bind(productController)
-);
+router.get('/:product_id', productController.get.bind(productController));
 
-router.patch(
-  '/:product_id',
-  mustHaveValidJWT,
-  productController.update.bind(productController)
-);
+router.delete('/:product_id', productController.delete.bind(productController));
+
+router.patch('/:product_id', productController.update.bind(productController));
 
 export default router;
