@@ -60,4 +60,14 @@ export default class ProductService implements IProductService {
 
     return this._toProduct(newProduct);
   }
+
+  public async delete(product_id: string): Promise<boolean> {
+    const deletedProduct = await this.productModel.findByIdAndDelete({
+      _id: product_id,
+    });
+
+    if (!deletedProduct) throw new Error('Product not found');
+
+    return true;
+  }
 }

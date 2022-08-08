@@ -38,7 +38,7 @@ export default class ProductController {
 
   public async create(req: Request, res: Response) {
     const product = req.body as IProduct;
-    const user_id = req.user.user_id;
+    const user_id = req.user.user_id as string;
 
     try {
       const savedProduct = await this.productService.create(user_id, product);
@@ -46,10 +46,21 @@ export default class ProductController {
       res.status(201);
       res.json(savedProduct);
     } catch (error) {
-      console.log(error.message);
-
       res.status(400);
       res.send('Unable to save the product');
+    }
+  }
+
+  public async delete(req: Request, res: Response) {
+    const product_id = req.params.product_id as string;
+
+    try {
+      const deleted = await this.productService.delete(product_id);
+
+      res.sendStatus(deleted ? 200 : 500);
+    } catch (error) {
+      res.status(404);
+      res.send(error.message);
     }
   }
 }

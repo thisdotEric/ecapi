@@ -31,4 +31,10 @@ router.get(
   productController.get.bind(productController)
 );
 
+router.delete(
+  '/:product_id',
+  mustHaveValidJWT,
+  productController.delete.bind(productController)
+);
+
 export default router;
