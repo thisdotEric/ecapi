@@ -167,4 +167,50 @@ describe('Product service test', () => {
     //   });
     // });
   });
+
+  describe('delete()', () => {
+    describe('user has provided a valid product_id', () => {
+      test('should delete the product and return true', async () => {
+        const product_id = 'product_id';
+
+        const mockProductModel: Partial<ProductModelType> = {
+          findByIdAndDelete: jest
+            .fn()
+            .mockReturnValue({ _id: product_id, ...createProductInput() }),
+        };
+
+        // @ts-ignore
+        const productService = new ProductService(mockProductModel);
+        const deleted = await productService.delete(product_id);
+
+        expect(mockProductModel.findByIdAndDelete).toHaveBeenCalledWith({
+          _id: product_id,
+        });
+        expect(deleted).toBeTruthy();
+      });
+    });
+
+    describe('user has provided an INVALID product_id', () => {
+      test("should throw an error 'Product not found'", async () => {
+        const product_id = '';
+
+        const mockProductModel: Partial<ProductModelType> = {
+          findByIdAndDelete: jest.fn().mockReturnValue(null),
+        };
+
+        // @ts-ignore
+        const productService = new ProductService(mockProductModel);
+
+        try {
+          await productService.delete(product_id);
+        } catch (error) {
+          expect(mockProductModel.findByIdAndDelete).toHaveBeenCalledWith({
+            _id: product_id,
+          });
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toBe('Product not found');
+        }
+      });
+    });
+  });
 });

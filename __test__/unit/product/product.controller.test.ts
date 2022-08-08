@@ -15,6 +15,7 @@ describe('Product controller test', () => {
     json: jest.fn().mockImplementation((data) => data),
     sendStatus: jest.fn(),
     status: jest.fn(),
+    send: jest.fn(),
   };
 
   describe('create()', () => {
@@ -120,6 +121,73 @@ describe('Product controller test', () => {
         );
         expect(res.json).toHaveBeenCalledWith(products);
         expect(res.status).toHaveBeenCalledWith(200);
+      });
+    });
+  });
+
+  describe('delete()', () => {
+    describe('user has a valid user_id and product_id', () => {
+      test('should delete the product and send 200 status code', async () => {
+        const product_id = 'product_id';
+        const user_id = 'user_id';
+
+        const mockedProductService: Partial<IProductService> = {
+          delete: jest.fn().mockReturnValue(true),
+        };
+
+        // @ts-ignore
+        const productController = new ProductController(mockedProductService);
+
+        const req: Partial<Request & User> = {
+          params: {
+            product_id,
+          },
+          user: {
+            user_id,
+          },
+        };
+
+        // @ts-ignore
+        await productController.delete(req, res);
+
+        expect(mockedProductService.delete).toHaveBeenLastCalledWith(
+          req.params!.product_id
+        );
+        expect(res.json).not.toHaveBeenCalledWith();
+      });
+    });
+
+    describe('user has provided an invalid product_id', () => {
+      test('should send status of 404 not found', async () => {
+        const mockedProductService: Partial<IProductService> = {
+          delete: jest.fn().mockReturnValue(false),
+        };
+
+        // @ts-ignore
+        const productController = new ProductController(mockedProductService);
+
+        const req: Partial<Request & User> = {
+          params: {
+            product_id: 'product_id',
+          },
+          user: {
+            user_id: 'user_id',
+          },
+        };
+
+        try {
+          // @ts-ignore
+          await productController.delete(req, res);
+        } catch (error) {
+          expect(mockedProductService.delete).toHaveBeenLastCalledWith(
+            req.params!.product_id
+          );
+          expect(res.json).not.toHaveBeenCalledWith();
+          expect(res.sendStatus).not.toHaveBeenCalledWith();
+          expect(res.status).toHaveBeenCalledWith(404);
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toBe('Product not found');
+        }
       });
     });
   });
