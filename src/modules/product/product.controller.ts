@@ -55,7 +55,10 @@ export default class ProductController {
     const product_id = req.params.product_id as string;
 
     try {
-      const deleted = await this.productService.delete(product_id);
+      const deleted = await this.productService.delete(
+        req.user.user_id,
+        product_id
+      );
 
       res.sendStatus(deleted ? 200 : 500);
     } catch (error) {
@@ -70,6 +73,7 @@ export default class ProductController {
 
     try {
       const newlyUpdatedProduct = await this.productService.update(
+        req.user.user_id,
         product_id,
         product
       );

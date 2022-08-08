@@ -61,9 +61,10 @@ export default class ProductService implements IProductService {
     return this._toProduct(newProduct);
   }
 
-  public async delete(product_id: string): Promise<boolean> {
-    const deletedProduct = await this.productModel.findByIdAndDelete({
+  public async delete(user_id: string, product_id: string): Promise<boolean> {
+    const deletedProduct = await this.productModel.findOneAndDelete({
       _id: product_id,
+      user_id,
     });
 
     if (!deletedProduct) throw new Error('Product not found');
@@ -72,12 +73,14 @@ export default class ProductService implements IProductService {
   }
 
   public async update(
+    user_id: string,
     product_id: string,
     updatedProduct: Partial<IProduct>
   ): Promise<ICreatedProduct> {
-    const returnedUpdatedProduct = await this.productModel.findByIdAndUpdate(
+    const returnedUpdatedProduct = await this.productModel.findOneAndUpdate(
       {
         _id: product_id,
+        user_id,
       },
       {
         ...updatedProduct,
