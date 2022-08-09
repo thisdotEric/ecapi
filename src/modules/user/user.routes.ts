@@ -1,9 +1,9 @@
 import { getModelForClass } from '@typegoose/typegoose';
 import { Router } from 'express';
 import {
-  mustProvideValidLoginCredentials,
   mustHaveValidJWT,
   validateCreateUserInput,
+  mustHaveValidLoginInput,
 } from '../../middlewares';
 
 import UserController from './user.controller';
@@ -35,7 +35,7 @@ router.patch('/', mustHaveValidJWT, userController.update.bind(userController));
 
 router.post(
   '/sessions',
-  mustProvideValidLoginCredentials,
+  mustHaveValidLoginInput,
   userController.login.bind(userController)
 );
 
