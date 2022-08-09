@@ -51,6 +51,10 @@ export default class UserService implements IUserService, ISessionService {
     email,
     password,
   }: ICreateUserInput): Promise<ICreatedUser<string>> {
+    const emailAlreadyExists = await this.userModel.findOne({ email });
+
+    if (emailAlreadyExists) throw new Error('Email already exists');
+
     const { salt, hashedPassword } = await hashPassword(password);
 
     const userDoc = await this.userModel.create({

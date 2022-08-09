@@ -8,30 +8,63 @@ import { ITokens } from '../../../src/modules/user/user.interface';
 
 describe('User Service tests', () => {
   describe('create()', () => {
-    test('should create a new user', async () => {
-      const newUserInput = createUserInput();
+    describe('user has provided valid name and email', () => {
+      test('should create a new user', async () => {
+        const newUserInput = createUserInput();
 
-      const expectedUser: ICreatedUser<string> = {
-        id: expect.any(String),
-        name: newUserInput.name,
-        email: newUserInput.email,
-      };
+        const expectedUser: ICreatedUser<string> = {
+          id: expect.any(String),
+          name: newUserInput.name,
+          email: newUserInput.email,
+        };
 
-      const mockedUserModel: Partial<ReturnModelType<typeof User, BeAnObject>> =
-        {
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
           create: jest.fn().mockReturnValue({
+            _id: expect.any(String),
+            name: newUserInput.name,
+            email: newUserInput.email,
+          }),
+          findOne: jest.fn().mockReturnValue(null),
+        };
+
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
+        const actualCreatedUser = await userService.create(newUserInput);
+
+        expect(mockedUserModel.create).toBeCalledTimes(1);
+        expect(actualCreatedUser).toEqual(expectedUser);
+      });
+    });
+
+    describe('user has provided an existing email address', () => {
+      test("should throw an error 'Email already exists'", async () => {
+        const newUserInput = createUserInput();
+
+        const mockedUserModel: Partial<
+          ReturnModelType<typeof User, BeAnObject>
+        > = {
+          findOne: jest.fn().mockReturnValue({
             _id: expect.any(String),
             name: newUserInput.name,
             email: newUserInput.email,
           }),
         };
 
-      // @ts-ignore
-      const userService = new UserService(mockedUserModel);
-      const actualCreatedUser = await userService.create(newUserInput);
+        // @ts-ignore
+        const userService = new UserService(mockedUserModel);
 
-      expect(mockedUserModel.create).toBeCalledTimes(1);
-      expect(actualCreatedUser).toEqual(expectedUser);
+        try {
+          await userService.create(newUserInput);
+        } catch (error) {
+          expect(mockedUserModel.findOne).toBeCalledWith({
+            email: newUserInput.email,
+          });
+          expect(error).toBeInstanceOf(Error);
+          expect(error.message).toBe('Email already exists');
+        }
+      });
     });
   });
 
