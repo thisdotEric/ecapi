@@ -32,6 +32,14 @@
 
 # Postman Collection and API Documentation
 
+Collection
+
 ```
-https://www.postman.com/thisdoteric/workspace/blogapi/collection/14131227-5ab04075-d06d-40a7-9077-b1aae218a366?action=share&creator=14131227
+https://www.postman.com/thisdoteric/workspace/ecapi/collection/14131227-5ab04075-d06d-40a7-9077-b1aae218a366?action=share&creator=14131227
+```
+
+Documentation
+
+```
+https://www.postman.com/thisdoteric/workspace/ecapi/documentation/14131227-5ab04075-d06d-40a7-9077-b1aae218a366
 ```
