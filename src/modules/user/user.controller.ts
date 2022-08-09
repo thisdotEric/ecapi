@@ -11,7 +11,7 @@ export default class UserController {
   }
 
   /**
-   * create
+   * Create new user
    */
   public async create(req: Request, res: Response) {
     const userInput = req.body as ICreateUserInput;
@@ -27,7 +27,7 @@ export default class UserController {
   }
 
   /**
-   * get
+   * Get single user
    */
   public async get(req: Request, res: Response) {
     try {
@@ -42,7 +42,7 @@ export default class UserController {
   }
 
   /**
-   * delete
+   * Delete a user based on the given user_id
    */
   public async delete(req: Request, res: Response) {
     try {
@@ -56,7 +56,7 @@ export default class UserController {
   }
 
   /**
-   * update
+   * Update user information except the password
    */
   public async update(req: Request, res: Response) {
     try {
@@ -76,7 +76,7 @@ export default class UserController {
   }
 
   /**
-   * login
+   * Log in user using their registered email and password
    */
   public async login(req: Request, res: Response) {
     try {
@@ -92,7 +92,8 @@ export default class UserController {
   }
 
   /**
-   * getAll
+   * Get all users.
+   * The user can get all users as long as s/he is logged in. Might change if role based authentication is added
    */
   public async getAll(_: Request, res: Response) {
     try {

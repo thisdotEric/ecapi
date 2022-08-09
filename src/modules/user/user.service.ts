@@ -22,6 +22,7 @@ export default class UserService implements IUserService, ISessionService {
     private readonly userModel: ReturnModelType<typeof User, BeAnObject>
   ) {}
 
+  // Helper function to transform user document to ICreatedUser object
   private _toUser({ _id: id, name, email }: UserDoc): ICreatedUser<string> {
     return {
       id,
@@ -30,6 +31,11 @@ export default class UserService implements IUserService, ISessionService {
     };
   }
 
+  /**
+   * Get single user
+   * @param user_id
+   * @returns the user associated with the given user_id
+   */
   public async get(user_id: string): Promise<ICreatedUser<string>> {
     const user = await this.userModel.findById({
       _id: user_id,
@@ -43,7 +49,7 @@ export default class UserService implements IUserService, ISessionService {
   /**
    * Create a new user
    * @param ICreateUserInput
-   * @returns ICreatedUser<number>
+   * @returns the newly created user
    */
 
   public async create({
@@ -69,6 +75,11 @@ export default class UserService implements IUserService, ISessionService {
     return this._toUser(userDoc);
   }
 
+  /**
+   * Delete a user
+   * @param user_id
+   * @returns true if the user is successfully deleted, otherwise throws an exception
+   */
   public async delete(user_id: string): Promise<boolean> {
     const deletedUser = await this.userModel.findByIdAndDelete({
       _id: user_id,
@@ -79,6 +90,12 @@ export default class UserService implements IUserService, ISessionService {
     return true;
   }
 
+  /**
+   * Update a given user
+   * @param user_id
+   * @param updatedUserInfo
+   * @returns the updated user informations
+   */
   public async update(
     user_id: string,
     updatedUserInfo: IUser
@@ -96,6 +113,13 @@ export default class UserService implements IUserService, ISessionService {
     return this._toUser(updatedUser);
   }
 
+  /**
+   * Logs in user using their email and password
+   * @param email
+   * @param password
+   * @param validatePasswordFn
+   * @returns the access token and refresh token to be used for authentication/authorization
+   */
   public async login(
     email: string,
     password: string,
@@ -127,6 +151,10 @@ export default class UserService implements IUserService, ISessionService {
     throw new Error('Method not implemented.');
   }
 
+  /**
+   * Get all users
+   * @returns an array of all users
+   */
   public async getAll(): Promise<ICreatedUser<string>[]> {
     const users = await this.userModel.find({});
 
