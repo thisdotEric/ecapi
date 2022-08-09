@@ -36,14 +36,14 @@ export const validateCreateUserInput = (
 
   const { email, password, confirm_password } = userInput;
 
-  if (emailSchema.parse(email) === '') {
-    res.status(400);
-    return res.send('Invalid email');
-  }
-
   if (passwordDoesNotMatched(password, confirm_password)) {
     res.status(400);
     return res.send('Password does not match');
+  }
+
+  if (emailSchema.parse(email) === '') {
+    res.status(400);
+    return res.send('Invalid email');
   }
 
   return next();

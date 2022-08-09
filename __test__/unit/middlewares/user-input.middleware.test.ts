@@ -50,7 +50,7 @@ describe('validateCreateUserInput middleware', () => {
       };
 
       jest.spyOn(CreateUserInputSchema, 'parse').mockReturnValue(body);
-      emailSchema.parse = jest.fn().mockResolvedValue('');
+      emailSchema.parse = jest.fn().mockReturnValue('valid@gmail.com');
 
       // @ts-ignore
       await validateCreateUserInput(req, res, next);
@@ -74,7 +74,6 @@ describe('validateCreateUserInput middleware', () => {
       };
 
       jest.spyOn(CreateUserInputSchema, 'parse').mockReturnValue(req_body);
-      emailSchema.parse = jest.fn().mockResolvedValue('');
 
       // @ts-ignore
       await validateCreateUserInput(req, res, next);
@@ -98,7 +97,6 @@ describe('validateCreateUserInput middleware', () => {
       };
 
       CreateUserInputSchema.parse = jest.fn().mockReturnValue(undefined);
-      emailSchema.parse = jest.fn().mockReturnValue('');
 
       // @ts-ignore
       await validateCreateUserInput(req, res, next);
@@ -122,6 +120,8 @@ describe('validateCreateUserInput middleware', () => {
       };
 
       CreateUserInputSchema.parse = jest.fn().mockReturnValue(req_body);
+
+      // Returning an empty string indicatates a failed parsing of string to email
       emailSchema.parse = jest.fn().mockReturnValue('');
 
       // @ts-ignore
