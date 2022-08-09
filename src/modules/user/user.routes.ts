@@ -4,6 +4,7 @@ import {
   mustHaveValidJWT,
   validateCreateUserInput,
   mustHaveValidLoginInput,
+  mustBeValidUpdatedUser,
 } from '../../middlewares';
 
 import UserController from './user.controller';
@@ -31,7 +32,12 @@ router.delete(
   userController.delete.bind(userController)
 );
 
-router.patch('/', mustHaveValidJWT, userController.update.bind(userController));
+router.patch(
+  '/',
+  mustHaveValidJWT,
+  mustBeValidUpdatedUser,
+  userController.update.bind(userController)
+);
 
 router.post(
   '/sessions',
