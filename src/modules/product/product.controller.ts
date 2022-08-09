@@ -6,7 +6,7 @@ export default class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   /**
-   * get
+   * Get a single product based on the given product_id
    */
   public async get(req: Request, res: Response) {
     const product_id = req.params.product_id as string;
@@ -23,7 +23,7 @@ export default class ProductController {
   }
 
   /**
-   * getAll
+   * Get all products associated with the currently logged in user
    */
   public async getAll(req: Request, res: Response) {
     try {
@@ -36,6 +36,9 @@ export default class ProductController {
     }
   }
 
+  /**
+   * Create a new product and will be associated to the currently logged in user
+   */
   public async create(req: Request, res: Response) {
     const product = req.body as IProduct;
     const user_id = req.user.user_id as string;
@@ -51,6 +54,9 @@ export default class ProductController {
     }
   }
 
+  /**
+   * Delete a product based on the given product_id and the currently logged in user
+   */
   public async delete(req: Request, res: Response) {
     const product_id = req.params.product_id as string;
 
@@ -67,6 +73,9 @@ export default class ProductController {
     }
   }
 
+  /**
+   * Update a product based on the given product_id and the currently logged in user
+   */
   public async update(req: Request, res: Response) {
     const product_id = req.params.product_id as string;
     const product = req.body as Partial<IProduct>;
