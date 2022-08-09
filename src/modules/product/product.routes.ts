@@ -4,7 +4,10 @@ import { mustHaveValidJWT } from '../../middlewares';
 import ProductController from './product.controller';
 import { Product } from './product.model';
 import ProductService from './product.service';
-import { mustBeValidProduct } from '../../middlewares';
+import {
+  mustBeValidUpdatedProduct,
+  mustBeValidProduct,
+} from '../../middlewares';
 
 const productModel = getModelForClass(Product);
 
@@ -14,7 +17,7 @@ const productController = new ProductController(
 
 const router = Router();
 
-// Important, this middleware will be applied to all routes
+// Important, this middleware will be applied to all succeeding routes
 router.use(mustHaveValidJWT);
 
 router.post(
@@ -29,6 +32,10 @@ router.get('/:product_id', productController.get.bind(productController));
 
 router.delete('/:product_id', productController.delete.bind(productController));
 
-router.patch('/:product_id', productController.update.bind(productController));
+router.patch(
+  '/:product_id',
+  mustBeValidUpdatedProduct,
+  productController.update.bind(productController)
+);
 
 export default router;
