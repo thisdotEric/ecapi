@@ -11,9 +11,9 @@ export const mustHaveValidLoginInput = (
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    LoginInputSchema.parse(req.body);
-  } catch (error) {
+  const { success } = LoginInputSchema.safeParse(req.body);
+
+  if (!success) {
     res.status(400);
     return res.send('Invalid password or email form');
   }

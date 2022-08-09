@@ -1,7 +1,6 @@
 import { mustHaveValidLoginInput } from '../../../src/middlewares';
 import { LoginInputSchema } from '../../../src/middlewares/login-user-input.middleware';
 import { Request, Response } from 'express';
-import { ZodError } from 'zod';
 
 describe('mustHaveValidLoginInput middleware', () => {
   let res: Partial<Response>;
@@ -28,19 +27,23 @@ describe('mustHaveValidLoginInput middleware', () => {
         body: req_body,
       };
 
-      jest.spyOn(LoginInputSchema, 'parse').mockReturnValue(req_body);
+      LoginInputSchema.safeParse = jest.fn().mockReturnValue({ success: true });
 
       // @ts-ignore
       await mustHaveValidLoginInput(req, res, next);
 
       expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalledWith(400);
+      expect(res.send).not.toHaveBeenCalledWith(
+        'Invalid password or email form'
+      );
     });
   });
 
   describe('user has provided INVALID email and password form', () => {
     test("should return status 400 and 'Error parsing login input' message", async () => {
       const req_body = {
-        email: 'invalidemail',
+        email: 'email',
         password: '',
       };
 
@@ -48,17 +51,16 @@ describe('mustHaveValidLoginInput middleware', () => {
         body: req_body,
       };
 
-      LoginInputSchema.parse = jest.fn().mockReturnValue(undefined);
+      LoginInputSchema.safeParse = jest
+        .fn()
+        .mockReturnValue({ success: false });
 
-      try {
-        // @ts-ignore
-        await mustHaveValidLoginInput(req, res, next);
-      } catch (error) {
-        expect(error).toBeInstanceOf(ZodError);
-        expect(next).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.send).toHaveBeenCalledWith('Invalid password or email form');
-      }
+      // @ts-ignore
+      await mustHaveValidLoginInput(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith('Invalid password or email form');
     });
   });
 });

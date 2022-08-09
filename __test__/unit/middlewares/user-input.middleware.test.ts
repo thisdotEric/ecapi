@@ -23,24 +23,10 @@ describe('validateCreateUserInput middleware', () => {
 
     body = {
       name: 'name',
-      email: 'email',
+      email: 'valid@gmail.com',
       password: 'password',
       confirm_password: 'password',
     };
-  });
-
-  describe('user has provided NULL request body', () => {
-    test('should send a status of 400', async () => {
-      const req: Partial<Request> = {
-        body: null,
-      };
-
-      // @ts-ignore
-      await validateCreateUserInput(req, res, next);
-
-      expect(res.sendStatus).toHaveBeenCalledWith(400);
-      expect(next).not.toHaveBeenCalled();
-    });
   });
 
   describe('user has provided VALID request body', () => {
@@ -50,6 +36,9 @@ describe('validateCreateUserInput middleware', () => {
       };
 
       jest.spyOn(CreateUserInputSchema, 'parse').mockReturnValue(body);
+      CreateUserInputSchema.safeParse = jest
+        .fn()
+        .mockReturnValue({ success: true });
       emailSchema.parse = jest.fn().mockReturnValue('valid@gmail.com');
 
       // @ts-ignore
@@ -73,6 +62,9 @@ describe('validateCreateUserInput middleware', () => {
         body: req_body,
       };
 
+      CreateUserInputSchema.safeParse = jest
+        .fn()
+        .mockReturnValue({ success: true });
       jest.spyOn(CreateUserInputSchema, 'parse').mockReturnValue(req_body);
 
       // @ts-ignore
@@ -81,55 +73,6 @@ describe('validateCreateUserInput middleware', () => {
       expect(res.sendStatus).not.toHaveBeenCalledWith(400);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith('Password does not match');
-      expect(next).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("user has provided request body with ATLEAST ONE property has a value of '' or null", () => {
-    test("should send status of 400 and 'Invalid request body form' message", async () => {
-      const req: Partial<Request> = {
-        body: {
-          name: 'null',
-          email: '',
-          password: null,
-          confirm_password: 'password1',
-        },
-      };
-
-      CreateUserInputSchema.parse = jest.fn().mockReturnValue(undefined);
-
-      // @ts-ignore
-      await validateCreateUserInput(req, res, next);
-
-      expect(res.sendStatus).not.toHaveBeenCalledWith(400);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith('Invalid request body form');
-      expect(next).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('user has provided an INVALID email', () => {
-    test("should send status of 400 and 'Invalid email' message", async () => {
-      const req_body = {
-        ...body,
-        email: 'john@gmail.com',
-      };
-
-      const req: Partial<Request> = {
-        body: req_body,
-      };
-
-      CreateUserInputSchema.parse = jest.fn().mockReturnValue(req_body);
-
-      // Returning an empty string indicatates a failed parsing of string to email
-      emailSchema.parse = jest.fn().mockReturnValue('');
-
-      // @ts-ignore
-      await validateCreateUserInput(req, res, next);
-
-      expect(res.sendStatus).not.toHaveBeenCalledWith(400);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith('Invalid email');
       expect(next).not.toHaveBeenCalled();
     });
   });
